@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, SSZipArchiveErrorCode) {
 
 @protocol SSZipArchiveDelegate;
 
-@interface SSZipArchive : NSObject
+@interface RNZipArchive : NSObject
 
 // Password check
 + (BOOL)isFilePasswordProtectedAtPath:(NSString *)path;

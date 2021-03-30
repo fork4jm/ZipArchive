@@ -6,7 +6,7 @@
 //  Copyright (c) Sam Soffes 2010-2015. All rights reserved.
 //
 
-#import "SSZipArchive.h"
+#import "RNZipArchive.h"
 #include "minizip/unzip.h"
 #include "minizip/zip.h"
 #include "minizip/minishared.h"
@@ -34,11 +34,11 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
 - (NSString *)_sanitizedPath;
 @end
 
-@interface SSZipArchive ()
+@interface RNZipArchive ()
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 @end
 
-@implementation SSZipArchive
+@implementation RNZipArchive
 {
     /// path for zip file
     NSString *_path;
@@ -380,7 +380,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
             
             BOOL fileIsSymbolicLink = _fileIsSymbolicLink(&fileInfo);
             
-            NSString * strPath = [SSZipArchive _filenameStringWithCString:filename
+            NSString * strPath = [RNZipArchive _filenameStringWithCString:filename
                                                           version_made_by:fileInfo.version
                                                      general_purpose_flag:fileInfo.flag
                                                                      size:fileInfo.size_filename];
@@ -700,19 +700,19 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
 #pragma mark - Zipping
 + (BOOL)createZipFileAtPath:(NSString *)path withFilesAtPaths:(NSArray<NSString *> *)paths
 {
-    return [SSZipArchive createZipFileAtPath:path withFilesAtPaths:paths withPassword:nil];
+    return [RNZipArchive createZipFileAtPath:path withFilesAtPaths:paths withPassword:nil];
 }
 + (BOOL)createZipFileAtPath:(NSString *)path withContentsOfDirectory:(NSString *)directoryPath {
-    return [SSZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath withPassword:nil];
+    return [RNZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath withPassword:nil];
 }
 
 + (BOOL)createZipFileAtPath:(NSString *)path withContentsOfDirectory:(NSString *)directoryPath keepParentDirectory:(BOOL)keepParentDirectory {
-    return [SSZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath keepParentDirectory:keepParentDirectory withPassword:nil];
+    return [RNZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath keepParentDirectory:keepParentDirectory withPassword:nil];
 }
 
 + (BOOL)createZipFileAtPath:(NSString *)path withFilesAtPaths:(NSArray<NSString *> *)paths withPassword:(NSString *)password
 {
-    SSZipArchive *zipArchive = [[SSZipArchive alloc] initWithPath:path];
+    RNZipArchive *zipArchive = [[RNZipArchive alloc] initWithPath:path];
     BOOL success = [zipArchive open];
     if (success) {
         for (NSString *filePath in paths) {
@@ -724,12 +724,12 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
 }
 
 + (BOOL)createZipFileAtPath:(NSString *)path withContentsOfDirectory:(NSString *)directoryPath withPassword:(nullable NSString *)password {
-    return [SSZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath keepParentDirectory:NO withPassword:password];
+    return [RNZipArchive createZipFileAtPath:path withContentsOfDirectory:directoryPath keepParentDirectory:NO withPassword:password];
 }
 
 
 + (BOOL)createZipFileAtPath:(NSString *)path withContentsOfDirectory:(NSString *)directoryPath keepParentDirectory:(BOOL)keepParentDirectory withPassword:(nullable NSString *)password {
-    return [SSZipArchive createZipFileAtPath:path
+    return [RNZipArchive createZipFileAtPath:path
                      withContentsOfDirectory:directoryPath
                          keepParentDirectory:keepParentDirectory
                                 withPassword:password
@@ -753,7 +753,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
                         AES:(BOOL)aes
             progressHandler:(void(^ _Nullable)(NSUInteger entryNumber, NSUInteger total))progressHandler {
     
-    SSZipArchive *zipArchive = [[SSZipArchive alloc] initWithPath:path];
+    RNZipArchive *zipArchive = [[RNZipArchive alloc] initWithPath:path];
     BOOL success = [zipArchive open];
     if (success) {
         // use a local fileManager (queue/thread compatibility)
@@ -820,7 +820,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
     
     zip_fileinfo zipInfo = {};
     
-    [SSZipArchive zipInfo:&zipInfo setAttributesOfItemAtPath:path];
+    [RNZipArchive zipInfo:&zipInfo setAttributesOfItemAtPath:path];
     
     int error = _zipOpenEntry(_zip, [folderName stringByAppendingString:@"/"], &zipInfo, Z_NO_COMPRESSION, password, 0);
     const void *buffer = NULL;
@@ -857,7 +857,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
     
     zip_fileinfo zipInfo = {};
     
-    [SSZipArchive zipInfo:&zipInfo setAttributesOfItemAtPath:path];
+    [RNZipArchive zipInfo:&zipInfo setAttributesOfItemAtPath:path];
     
     void *buffer = malloc(CHUNK);
     if (buffer == NULL)
@@ -894,7 +894,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
         return NO;
     }
     zip_fileinfo zipInfo = {};
-    [SSZipArchive zipInfo:&zipInfo setDate:[NSDate date]];
+    [RNZipArchive zipInfo:&zipInfo setDate:[NSDate date]];
     
     int error = _zipOpenEntry(_zip, filename, &zipInfo, compressionLevel, password, aes);
     
@@ -1019,7 +1019,7 @@ BOOL _fileIsSymbolicLink(const unz_file_info *fileInfo);
 
 + (void)zipInfo:(zip_fileinfo *)zipInfo setDate:(NSDate *)date
 {
-    NSCalendar *currentCalendar = SSZipArchive._gregorian;
+    NSCalendar *currentCalendar = RNZipArchive._gregorian;
     NSCalendarUnit flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     NSDateComponents *components = [currentCalendar components:flags fromDate:date];
     struct tm tmz_date;
